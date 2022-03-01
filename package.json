@@ -1,0 +1,20 @@
+{
+  "name": "Backend-Assignment-5",
+  "version": "1.0.0",
+  "description": "Todo list with Pagination",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RashmiKhanagwal/Backend-Assignment-5.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RashmiKhanagwal/Backend-Assignment-5/issues"
+  },
+  "homepage": "https://github.com/RashmiKhanagwal/Backend-Assignment-5#readme"
+}
