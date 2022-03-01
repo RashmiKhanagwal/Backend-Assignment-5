@@ -2,11 +2,16 @@ const express = require('express');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Todo = require("../models/todo");
 
 // Create api to get TODO list for User
 
 module.exports.getAllTodo = async (req, res)=>{
-    User.find().populate('todoList')
+    // Add pagination -- Day5
+    let {page=1, limit=10} = req.query;
+    page = parseInt(page)
+    limit = parseInt(limit)
+    User.find().populate('todoList').skip((page-1)*limit).limit(limit)
     .then((user)=>{
         res.status(200).json(user)
     })
@@ -14,8 +19,6 @@ module.exports.getAllTodo = async (req, res)=>{
         res.status(500).json({message : err.message})
     })
 };
-
-
 
 // create user --- register
 
@@ -141,3 +144,81 @@ module.exports.deleteUser = async(req, res)=>{
         res.status(500).json({message : err.message})
     })
 };
+
+// Day 5
+// Create an API to get number of registered users for the Day
+
+module.exports.todayRegistered = async (req, res) => {
+    //const todayDate = new Date()
+    let { page = 1, limit = 10 } = req.query
+    page = parseInt(page)
+    limit = parseInt(limit)
+    User.find({
+        createdAt: {
+            $lt: new Date(),
+            $gte: new Date(new Date().setDate(new Date().getDate() - 1))
+        }
+    })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .then((user) => {
+            res.status(200).json(user)
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message })
+        })
+};
+
+// - Create API to get active users for the below:
+
+// 1. for current day
+
+module.exports.todayActive = async (req, res) => {
+    let { page = 1, limit = 10 } = req.query
+    page = parseInt(page)
+    limit = parseInt(limit)
+    await Todo.aggregate([{ $match: { updatedAt: { $lt: new Date(), $gte: new Date(new Date().setDate(new Date().getDate() - 1)) } } }, { $project: { userId: 1 } }])
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .then((todo) => {
+            res.status(200).json(todo)
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message })
+        })
+};
+
+// 2. for a week
+
+module.exports.weekActive = async (req, res) => {
+    let { page = 1, limit = 10 } = req.query
+    page = parseInt(page)
+    limit = parseInt(limit)
+    await Todo.aggregate([{ $match: { updatedAt: { $lt: new Date(), $gte: new Date(new Date().setDate(new Date().getDate() - 7)) } } }, { $project: { userId: 1 } }])
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .then((todo) => {
+            res.status(200).json(todo)
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message })
+        })
+};
+
+// 3. for a month
+
+module.exports.monthActive = async (req, res) => {
+    let { page = 1, limit = 10 } = req.query
+    page = parseInt(page)
+    limit = parseInt(limit)
+    await Todo.aggregate([{ $match: { updatedAt: { $lt: new Date(), $gte: new Date(new Date().setDate(new Date().getDate() - 30)) } } }, { $project: { userId: 1 } }])
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .then((todo) => {
+            res.status(200).json(todo)
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message })
+        })
+};
+
