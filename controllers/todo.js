@@ -1,4 +1,3 @@
-const router = require("express").Router();
 const Todo = require("../models/todo");
 
 // Day 1 Todo List
